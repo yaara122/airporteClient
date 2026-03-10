@@ -1,0 +1,98 @@
+
+        :root {
+            --primary: #0077b6;
+            --secondary: #023e8a;
+            --accent: #f4a261;
+            --light: #f0f5ff;
+            --dark: #2d3b4e;
+            --success: #57cc99;
+            --text: #333333;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(145deg, var(--primary), var(--secondary));
+            padding: 1.2rem;
+            position: relative;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .header_top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo_icon {
+            font-size: 1.8rem;
+            color: var(--light);
+            margin-right: 0.5rem;
+        }
+
+        .logo_text {
+            color: white;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .user_controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user_icon, .notifications {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 2.2rem;
+            height: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .user_icon:hover, .notifications:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(2px);
+        }
+
+        .nav_badge {
+            position: absolute;
+            top: -3px;
+            right: -5px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+    

@@ -1,7 +1,11 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { postUsers } from "../api/api";
 import classes from "./forms.module.css";
+import user from "../models/user";
+import UserContext from "../store/userProvider";
 import Card from "../components/UI/Card";
+import Button from "../components/UI/Button";
 
 const validationFormInitial: {
   nameIsValid: boolean;
@@ -10,6 +14,8 @@ const validationFormInitial: {
 } = { nameIsValid: true, emailIsValid: true, passwordIsValid: true };
 
 const SignUpPage: React.FC<{}> = () => {
+  const navigate = useNavigate();
+  const userCtx = useContext(UserContext);
   const formRef = useRef<HTMLFormElement>(null);
   const userNameInput = useRef<HTMLInputElement>(null);
   const emailInput = useRef<HTMLInputElement>(null);
@@ -22,8 +28,7 @@ const SignUpPage: React.FC<{}> = () => {
   }>(validationFormInitial);
 
   const submitHandler = async (event: React.FormEvent) => {
-
-    setFormValidation(validationFormInitial)
+    setFormValidation(validationFormInitial);
     event.preventDefault();
     if (userNameInput.current?.value.trim() === "") {
       setFormValidation((prevValidation) => {
@@ -45,45 +50,56 @@ const SignUpPage: React.FC<{}> = () => {
         });
       }
     }
-
+    //validate more efficantly
     if (
-      formValidation.emailIsValid &&
-      formValidation.nameIsValid &&
-      formValidation.passwordIsValid
-      && userNameInput.current?.value.trim() !== ""
+      !(
+        emailInput.current?.value.trim() === "" ||
+        !emailInput.current?.value.includes("@") ||
+        userNameInput.current?.value.trim() === "" ||
+        !passwordInput.current ||
+        passwordInput.current.value.trim().length < 7
+      )
     ) {
-      const data = {
+      const inputData = {
         userName: userNameInput.current?.value,
         email: emailInput.current?.value,
         password: passwordInput.current?.value,
       };
 
-      const serverrespones = await postUsers(data);
-      console.log(serverrespones);
-      if (formRef.current) {
-        formRef.current.reset();
-        // setFormValidation(validationFormInitial);
-      }      
-      //navigate to users requests page
+      try {
+        const { data } = await postUsers(inputData);
+        //make sure that all the fileds are full from the server
+        const newUser: user = {
+          userName: data.user.userName,
+          auth: data.token,
+          role: data.user.role,
+        };
+        userCtx.updateUserStatus(newUser);
+        navigate("/createRequest");
+      } catch (error) {
+        //show error output from server
+      }
     }
-
+    if (formRef.current) {
+      formRef.current.reset();
+    }
   };
 
   return (
     <Card classNames={classes.form}>
       <form onSubmit={submitHandler} ref={formRef}>
-        <h1>Sign Up</h1>
-        <label htmlFor="userName">Please enter a user name</label>
+        <h1>הרשמה</h1>
+        <label htmlFor="userName">אנא הכניסו שם משתמש</label>
         <input name="userName" type="text" ref={userNameInput}></input>
-        {!formValidation?.nameIsValid && <p>userName is invalid</p>}
-        <label htmlFor="email">Please enter your email</label>
+        {!formValidation?.nameIsValid && <p>השם משתמש פסול </p>}
+        <label htmlFor="email">אנא הכניסו מייל</label>
         <input name="email" type="text" ref={emailInput}></input>
-        {!formValidation?.emailIsValid && <p>email is invalid</p>}
-        <label htmlFor="password">Please enter a password</label>
+        {!formValidation?.emailIsValid && <p>המייל פסול</p>}
+        <label htmlFor="password">אנא הכניסו סיסמה</label>
         <input name="password" type="text" ref={passwordInput}></input>
-        {!formValidation?.passwordIsValid && <p>password is invalid</p>}
+        {!formValidation?.passwordIsValid && <p>הסימסה פסולה</p>}
 
-        <button type="submit">submit</button>
+        <Button type="submit">שליחה</Button>
       </form>
     </Card>
   );
