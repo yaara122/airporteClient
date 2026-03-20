@@ -53,9 +53,11 @@ const AddRequestForm: React.FC<{ requestType: string }> = (props) => {
     const data: requestItem = {
       title: titleInputRef.current?.value || "",
       type: props.requestType,
-      description: titleInputRef.current?.value || "",
+      description: descriptionInputRef.current?.value || "",
     };
 
+    console.log("adding request")
+    console.log(data)
     requestCtx.addRequest(data);
 
     if (formRef.current) {

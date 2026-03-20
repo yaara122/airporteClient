@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { userLogout } from "../api/api";
 import user from "../models/user";
@@ -32,7 +32,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = (
       setUserState({
         userName: localStorage.getItem("userName") || "",
         auth: localStorage.getItem("auth") || "",
-        role: localStorage.getItem("roll") || "",
+        role: localStorage.getItem("role") || "",
       });
       setIsLogedIn(true);
     }
@@ -40,7 +40,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = (
 
   //is called with server respones by signup or login forms
   const HandleUpdateUser = (user: user) => {
-    // try
     setIsLogedIn(true);
     setUserState({ ...user });
     localStorage.setItem("userName", user.userName);

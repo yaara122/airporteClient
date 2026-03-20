@@ -20,9 +20,7 @@ const Header = () => {
         <div className={classes.logo}>
           <div className={classes.logo_text}>AirPort</div>
           {userCtx.user && (
-            <i className={classes.logo_text}>
-              welcome {userCtx.user.userName}
-            </i>
+            <i className={classes.logo_text}>welcome {userCtx.user.userName}</i>
           )}
         </div>
         {/* אזור אישי מציג את הבקשות שלי */}
@@ -52,8 +50,16 @@ const Header = () => {
             </Link>
           ))}
 
-        {userCtx.user && userCtx.user.role === "מנהל" && (
-          <Button>תפריט מנהל</Button>
+        {userCtx.user && userCtx.user.role === "admin" && (
+          <Link to="/openRequests" className={btnClasses.button}>
+            בקשות פתוחות
+          </Link>
+        )}
+
+        {userCtx.user && userCtx.user.role === "admin" && (
+          <Link to="/requestsHistory" className={btnClasses.button}>
+            היסטוריית בקשות
+          </Link>
         )}
 
         {userCtx.user && <Button onClick={logoutHandler}>התנתקות</Button>}

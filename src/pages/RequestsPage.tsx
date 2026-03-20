@@ -6,18 +6,18 @@ const RequestsPage: React.FC<{}> = () => {
   const requestCtx = useContext(RequestContext);
   return (
     <Fragment>
-      {requestCtx.requests && (
+      {requestCtx.userRequests && (
         <div>
           <h1>הבקשות שלי</h1>
           <ul>
-            {requestCtx.requests.map((request) => (
+            {requestCtx.userRequests.map((request) => (
               <Request request={request} />
               // add key for each request
             ))}
           </ul>
         </div>
       )}
-      {!requestCtx.requests && <h1>הבקשות ריקות כרגע</h1>}
+      {!requestCtx.userRequests && <h1>הבקשות ריקות כרגע</h1>}
     </Fragment>
   );
 };

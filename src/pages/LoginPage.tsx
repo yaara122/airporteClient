@@ -49,21 +49,31 @@ const LoginPage: React.FC<{}> = () => {
       };
 
       try {
-        const {data} = await userLogin(userData);
-        //make suere that all the fileds are full from the server
+        const { data } = await userLogin(userData);       
         const newUser: user = {
           userName: data.user.userName,
           auth: data.token,
           role: data.user.role,
         };
+        console.log(newUser);
+        if (
+          newUser.auth === undefined ||
+          newUser.role === undefined ||
+          newUser.userName === undefined
+        ) {
+          console.log("the response is not full");
+          throw new Error();
+        }
         userCtx.updateUserStatus(newUser);
         navigate("/createRequest");
-      } catch (error) {}    
-      
-    }
-     if (formRef.current) {
-        formRef.current.reset();
+      } catch (error) {
+        //show error output from server
+        console.log(error);
       }
+    }
+    if (formRef.current) {
+      formRef.current.reset();
+    }
   };
 
   return (

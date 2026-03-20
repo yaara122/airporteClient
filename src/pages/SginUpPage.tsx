@@ -50,7 +50,7 @@ const SignUpPage: React.FC<{}> = () => {
         });
       }
     }
-    //validate more efficantly
+    //validate more efficantly?
     if (
       !(
         emailInput.current?.value.trim() === "" ||
@@ -67,17 +67,26 @@ const SignUpPage: React.FC<{}> = () => {
       };
 
       try {
-        const { data } = await postUsers(inputData);
-        //make sure that all the fileds are full from the server
+        const { data } = await postUsers(inputData);        
         const newUser: user = {
           userName: data.user.userName,
           auth: data.token,
           role: data.user.role,
         };
+        console.log(newUser);
+        if (
+          newUser.auth === undefined ||
+          newUser.role === undefined ||
+          newUser.userName === undefined
+        ) {
+          console.log("the response is not full");
+          throw new Error();
+        }
         userCtx.updateUserStatus(newUser);
         navigate("/createRequest");
       } catch (error) {
         //show error output from server
+        console.log(error);
       }
     }
     if (formRef.current) {

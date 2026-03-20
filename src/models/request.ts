@@ -4,14 +4,16 @@ class requestItem {
   description: string;
   status?: string;
   creatorName?: string;
+  createdAt?: string;
   examinerName?: string;
+  declineReason?: string
   id?: string;
 
   constructor() {
     this.title = "";
     this.type = "";
     this.description = "";
-    this.status = "pending";
+    this.status = "בהמתנה";
     this.creatorName = "";
   }
 }

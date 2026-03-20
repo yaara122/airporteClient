@@ -16,6 +16,7 @@ const client = axios.create({
 export const postUsers = (user) => client.post("/users", user);
 export const userLogin = (userInfo) => client.post("/users/login", userInfo);
 export const userLogout = (data, token) => client.post("/users/logout",data, token);
-// export const getUsersRequests = (userData) => client.get('/requests/user', { params: userData });
 export const postRequest = (requestData, token) => client.post("/requests", requestData, token);
-export const getRequests = () => client.get("/requests");
+export const getUserRequests = (token) => client.get("/requests", token);
+export const getAllRequests = (token) => client.get("/requests/getAllRequests", token);
+export const setRequestStatus = (data, token) => client.patch("/requests/setStatus", data, token);
