@@ -1,13 +1,25 @@
-import React, { useContext, Fragment, useState } from "react";
+import React, {
+  useContext,
+  Fragment,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import classes from "./pages.module.css";
 import RequestContext from "../store/RequestsProvider";
+import requestItem from "../models/request";
+import UserContext from "../store/userProvider";
 import Request from "../components/Request";
-import Button from "../components/UI/Button";
 
 const OpenRequestsPage: React.FC<{}> = () => {
   const requestCtx = useContext(RequestContext);
+  const userCtx = useContext(UserContext);
+  const [openRequests, setOpenRequests] = useState<requestItem[]>();
   const [typeInput, setTypeInput] = useState<string | null>(null);
 
-  const HandelTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const HandelTypeChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     let currentEventValue: string = event.target.value;
     if (currentEventValue === "none") {
       setTypeInput(null);
@@ -16,22 +28,29 @@ const OpenRequestsPage: React.FC<{}> = () => {
     }
   };
 
-  const filterSubmitHandlker = () => {
-    // if filter current !== last val{
-    // call ctx.getopenreq (type = ...)
-    //so it wont call fetch if not neccery
-    //}
-    requestCtx.getOpenRequests(typeInput);
-  };
+  const setOpenRequestsFunction = useCallback(async () => {
+    const params = {
+      status: "בהמתנה",
+      type: typeInput,
+    };
+    setOpenRequests(await requestCtx.generalGetRequestsAdmin(params));
+  }, [requestCtx, typeInput]);
+
+  useEffect(() => {
+    if (userCtx.user?.role === "admin") {
+      setOpenRequestsFunction();
+    }
+  }, [typeInput, userCtx.user, setOpenRequestsFunction]);
+
   return (
     <Fragment>
-      <div>
-        {requestCtx.openRequests ? (
+      <div className={classes.page}>
+       <div className={classes.data_container}>
+         {openRequests && openRequests.length > 0 ? (
           <h1>בקשות הממתינות לאישור</h1>
         ) : (
           <h1>אין בקשות לאישור כרגע</h1>
         )}
-        {/* make sure when changeing rout the option value dosent change or rest the requests list */}
         <select name="type" onChange={HandelTypeChange}>
           <option value="none">ללא</option>
           <option value="אישור_כניסה">בקשות אישור כניסה</option>
@@ -39,13 +58,17 @@ const OpenRequestsPage: React.FC<{}> = () => {
           <option value="קידוד_חוגר">בקשות קידוד חוגר</option>
           <option value="חתימה_שוס">בקשות חתימה על שו"ס</option>
         </select>
-        <Button onClick={filterSubmitHandlker}>סינון</Button>
+       </div>
       </div>
-      {requestCtx.openRequests && (
+      {openRequests && (
         <div>
-          <ul>
-            {requestCtx.openRequests.map((request) => (
-              <Request showBtnsOptions={true} request={request} />
+          <ul className={classes.container}>
+            {openRequests.map((request) => (
+              <Request
+                showBtnsOptions={true}
+                request={request}
+                resetOpenRequest={setOpenRequestsFunction}
+              />
               // add key for each request
             ))}
           </ul>

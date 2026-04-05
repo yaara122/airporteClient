@@ -2,8 +2,6 @@ import { useContext, useRef, useState, Fragment } from "react";
 import UserContext from "../store/userProvider";
 import RequestContext from "../store/RequestsProvider";
 import classes from "../pages/forms.module.css";
-import { postRequest } from "../api/api";
-import Card from "./UI/Card";
 import Button from "./UI/Button";
 import requestItem from "../models/request";
 
@@ -46,7 +44,6 @@ const AddRequestForm: React.FC<{ requestType: string }> = (props) => {
       titleInputRef.current?.value === "" ||
       !userCtx.user
     ) {
-      // console.log("not sending to server form is invalid");
       return;
     }
 
@@ -55,9 +52,6 @@ const AddRequestForm: React.FC<{ requestType: string }> = (props) => {
       type: props.requestType,
       description: descriptionInputRef.current?.value || "",
     };
-
-    console.log("adding request")
-    console.log(data)
     requestCtx.addRequest(data);
 
     if (formRef.current) {
@@ -68,15 +62,15 @@ const AddRequestForm: React.FC<{ requestType: string }> = (props) => {
   return (
     <Fragment>
       <form onSubmit={submitHandler} ref={formRef} className={classes.form}>
-        <h1>יצירת בקשת איפוס סיסמה חדשה</h1>
+        <h1>{props.requestType}</h1>
         <label htmlFor="title">אנא הכניסו כותרת לבקשה</label>
         <input name="title" type="text" ref={titleInputRef}></input>
-        {!formValidation?.titleIsValid && <p>Title can not be empty</p>}
+        {!formValidation?.titleIsValid && <p  className={classes.input_error}>הכותרת לא יכולה להיות ריקה</p>}
 
         <label htmlFor="ddescriptions">אנא הכניסו פירוט בנוגע לבקשה</label>
         <input name="description" type="text" ref={descriptionInputRef}></input>
         {!formValidation?.descriptionIsValid && (
-          <p>Description can not be empty</p>
+          <p className={classes.input_error}>התיאור לא יכול להיות ריק</p>
         )}
 
         <Button type="submit">שלח</Button>

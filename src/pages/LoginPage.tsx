@@ -1,5 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 import { userLogin } from "../api/api";
 import classes from "./forms.module.css";
 import user from "../models/user";
@@ -49,13 +50,12 @@ const LoginPage: React.FC<{}> = () => {
       };
 
       try {
-        const { data } = await userLogin(userData);       
+        const { data } = await userLogin(userData);
         const newUser: user = {
           userName: data.user.userName,
           auth: data.token,
           role: data.user.role,
         };
-        console.log(newUser);
         if (
           newUser.auth === undefined ||
           newUser.role === undefined ||
@@ -66,9 +66,19 @@ const LoginPage: React.FC<{}> = () => {
         }
         userCtx.updateUserStatus(newUser);
         navigate("/createRequest");
-      } catch (error) {
-        //show error output from server
-        console.log(error);
+      } catch (err) {
+        // const error = err as AxiosError<{
+        //   status: "error";
+        //   statusCode: number;
+        //   message: string;
+        // }>;
+        // console.log(error);
+        // if (error.response) {
+        //   console.error("API Error:", error.response.data.message);
+        // }
+        // //set error to error.response.data.message
+        // console.error(error);
+        alert("משהו השתבש")
       }
     }
     if (formRef.current) {
@@ -82,11 +92,11 @@ const LoginPage: React.FC<{}> = () => {
         <h1>התחברות</h1>
         <label htmlFor="userName">אנא הכניסו שם משתמש</label>
         <input name="userName" type="text" ref={userNameInput}></input>
-        {!formValidation?.nameIsValid && <p>שם משתמש לא יכול להיות ריק</p>}
+        {!formValidation?.nameIsValid && <p  className={classes.input_error}>שם משתמש לא יכול להיות ריק</p>}
         <label htmlFor="email">אנא הכניסו סיסמה</label>
         <input name="email" type="text" ref={passwordInput}></input>
-        {!formValidation?.passwordIsValid && <p>סיסמה לא יכולה להיות ריקה</p>}
-
+        {!formValidation?.passwordIsValid && <p  className={classes.input_error}>סיסמה לא יכולה להיות ריקה</p>}
+        
         <Button type="submit">התחברות</Button>
       </form>
     </Card>

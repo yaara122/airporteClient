@@ -1,13 +1,15 @@
 import classes from "./Request.module.css";
-import { setRequestStatus } from "../api/api";
+import btnClasses from "./UI/Button.module.css";
 import RequestContext from "../store/RequestsProvider";
 import requestItem from "../models/request";
 import { useContext, useRef, useState } from "react";
 import Button from "./UI/Button";
 
-const Request: React.FC<{ request: requestItem; showBtnsOptions?: boolean }> = (
-  props,
-) => {
+const Request: React.FC<{
+  request: requestItem;
+  showBtnsOptions?: boolean;
+  resetOpenRequest?: () => void;
+}> = (props) => {
   const requestCtx = useContext(RequestContext);
   const [showDeclinceInput, setShowDeclinceInput] = useState<boolean>(false);
   const [isDeclinceEmpty, setIsDeclinceEmpty] = useState<boolean>(false);
@@ -15,13 +17,12 @@ const Request: React.FC<{ request: requestItem; showBtnsOptions?: boolean }> = (
 
   const submitStatusChangeHandler = (event: any) => {
     let updateRequestData;
-    if (event.target.id === "approveBtn") {
+    if (event.target.innerText === "אישור") {
       updateRequestData = {
         requestId: props.request.id,
         status: "אושרה",
       };
-      // no need to reset the showDeclinceInput because the request should disappere after submitted
-    } else {
+    } else if (event.target.innerText === "שליחה") {
       if (declinceRef.current?.value === "") {
         setIsDeclinceEmpty(true);
         return;
@@ -34,6 +35,9 @@ const Request: React.FC<{ request: requestItem; showBtnsOptions?: boolean }> = (
       }
     }
     requestCtx.updateRequest(updateRequestData);
+    if (props.resetOpenRequest) {
+      props.resetOpenRequest();
+    }
   };
 
   return (
@@ -44,22 +48,25 @@ const Request: React.FC<{ request: requestItem; showBtnsOptions?: boolean }> = (
         {props.request.type}
       </p>
       <p>
-        <span>תיאור הבקשה: </span> {props.request.description}
+        <span>תיאור: </span> {props.request.description}
       </p>
       <p>
-        <span>סטטוס הבקשה: </span> {props.request.status}
+        <span>סטטוס הבקשה: </span>{" "}
+        <span
+          className={`${props.request.status === "אושרה" ? classes.approved : ""} ${props.request.status === "סורבה" ? classes.refused : ""}`}
+        >
+          {props.request.status}
+        </span>
       </p>
-      <p>
-        <span>יוצר הבקשה: </span> {props.request.creatorName}
-      </p>
-
-      <p>
-        <span>תאריך יצירת הבקשה </span> {props.request.createdAt}
-      </p>
+      {!window.location.href.endsWith("userData") && (
+        <p>
+          <span>יוצר הבקשה: </span> {props.request.creatorName}
+        </p>
+      )}
 
       {props.request.examinerName && (
         <p>
-          <span>בוחן הבקשה</span>
+          <span>בוחן הבקשה: </span>
           {props.request.examinerName}
         </p>
       )}
@@ -70,28 +77,35 @@ const Request: React.FC<{ request: requestItem; showBtnsOptions?: boolean }> = (
         </p>
       )}
 
-      {props.request.status === "בהמתנה" && props.showBtnsOptions && (
-        <button id="approveBtn" onClick={submitStatusChangeHandler}>
-          Approve
-        </button>
-      )}
-      {props.request.status === "בהמתנה" && props.showBtnsOptions && (
-        <button
-          onClick={() => {
-            setShowDeclinceInput(true);
-          }}
-        >
-          Reject
-        </button>
-      )}
+      <p>
+        <span>נוצר בתאריך:</span> {props.request.createdAt}
+      </p>
+
       {showDeclinceInput && props.showBtnsOptions && (
         <div>
           <label htmlFor="declinceInput">סיבת הדחייה</label>
           <input id="declinceInput" type="text" ref={declinceRef} />
           <Button onClick={submitStatusChangeHandler}>שליחה</Button>
-          {isDeclinceEmpty && <p>סיבת הדחייה לא יכולה להיות ריקה</p>}
+          {isDeclinceEmpty && <span>סיבת הדחייה לא יכולה להיות ריקה</span>}
         </div>
       )}
+
+      {props.request.status === "בהמתנה" &&
+        props.showBtnsOptions &&
+        !showDeclinceInput && (
+          <Button onClick={submitStatusChangeHandler}>אישור</Button>
+        )}
+      {props.request.status === "בהמתנה" &&
+        props.showBtnsOptions &&
+        !showDeclinceInput && (
+          <Button
+            onClick={() => {
+              setShowDeclinceInput(true);
+            }}
+          >
+            דחייה
+          </Button>
+        )}
     </div>
   );
 };

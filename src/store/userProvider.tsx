@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { userLogout } from "../api/api";
 import user from "../models/user";
@@ -22,6 +22,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = (
   const navigate = useNavigate();
   const [isLogedIn, setIsLogedIn] = useState<boolean>(false);
   const [userState, setUserState] = useState<user | null>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (
@@ -38,42 +39,45 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = (
     }
   }, []);
 
-  //is called with server respones by signup or login forms
-  const HandleUpdateUser = (user: user) => {
+  const HandleOnLogOut = (userAuth?: string) => {
+    let config = {
+      headers: {
+        Authorization: `Bearer ${userAuth ? userAuth : userState?.auth}`,
+      },
+    };
+
+    userLogout(config);
+    localStorage.removeItem("userName");
+    localStorage.removeItem("auth");
+    localStorage.removeItem("role");
+    setIsLogedIn(false);
+    setUserState(null);
+
+    if(timeoutId){
+      clearTimeout(timeoutId)
+    }
+    
+  };
+
+  const HandleUserStausUpdate = (user: user) => {
     setIsLogedIn(true);
     setUserState({ ...user });
     localStorage.setItem("userName", user.userName);
     localStorage.setItem("auth", user.auth);
     localStorage.setItem("role", user.role);
 
-    //logsout after an houer
-    setTimeout(() => {
-      alert("the session is over, you must login");
-      HandleOnLogOut();
-      navigate("/sginup");
-    }, 3600000);
-  };
-
-  const HandleOnLogOut = () => {
-    let token = {
-      headers: {
-        Authorization: "Bearer " + userContext.user?.auth,
-      },
-    };
-    let data = userContext.user;
-
-    userLogout(data, token);
-    localStorage.removeItem("userName");
-    localStorage.removeItem("auth");
-    localStorage.removeItem("role");
-    setIsLogedIn(false);
-    setUserState(null);
+    // logsout after an houer 3600000
+    setTimeoutId( setTimeout(() => {
+      navigate("/signup");
+      alert("the session is over, you must relogin");
+      HandleOnLogOut(user.auth);
+    }, 3600000));
   };
 
   const userContext: userContextObject = {
     isLogedIn: isLogedIn,
     user: userState,
-    updateUserStatus: HandleUpdateUser,
+    updateUserStatus: HandleUserStausUpdate,
     userLogout: HandleOnLogOut,
   };
 

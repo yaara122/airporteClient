@@ -1,4 +1,4 @@
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import classes from "./Header.module.css";
 import btnClasses from "./Button.module.css";
@@ -18,16 +18,11 @@ const Header = () => {
     <div className={classes.header}>
       <div className={classes.header_top}>
         <div className={classes.logo}>
-          <div className={classes.logo_text}>AirPort</div>
-          {userCtx.user && (
+          <div className={classes.logo_text}>שדה תעופה </div>
+          {/* {userCtx.user && (
             <i className={classes.logo_text}>welcome {userCtx.user.userName}</i>
-          )}
+          )} */}
         </div>
-        {/* אזור אישי מציג את הבקשות שלי */}
-        {/* <div className={classes.user_icon}>
-          <i>👤</i>
-        </div> */}
-
         {!userCtx.isLogedIn &&
           (window.location.href.endsWith("signup") ? (
             <Link to="/login" className={btnClasses.button}>
@@ -39,27 +34,27 @@ const Header = () => {
             </Link>
           ))}
 
-        {userCtx.isLogedIn &&
-          (window.location.href.endsWith("createRequest") ? (
-            <Link to="/userData" className={btnClasses.button}>
-              אזור אישי👤
+        {userCtx.isLogedIn && (
+          <Fragment>
+            <Link to="/userData" className={classes.trend_tag}>
+              אזור אישי
             </Link>
-          ) : (
-            <Link to="/createRequest" className={btnClasses.button}>
+
+            <Link to="/createRequest" className={classes.trend_tag}>
               יצירת בקשה
             </Link>
-          ))}
-
-        {userCtx.user && userCtx.user.role === "admin" && (
-          <Link to="/openRequests" className={btnClasses.button}>
-            בקשות פתוחות
-          </Link>
+          </Fragment>
         )}
 
         {userCtx.user && userCtx.user.role === "admin" && (
-          <Link to="/requestsHistory" className={btnClasses.button}>
-            היסטוריית בקשות
-          </Link>
+          <Fragment>
+            <Link to="/openRequests" className={classes.trend_tag}>
+              בקשות פתוחות
+            </Link>
+            <Link to="/requestsHistory" className={classes.trend_tag}>
+              היסטוריית בקשות
+            </Link>
+          </Fragment>
         )}
 
         {userCtx.user && <Button onClick={logoutHandler}>התנתקות</Button>}

@@ -1,89 +1,43 @@
-import React, { useContext, useEffect } from "react";
-import requestItem from "../models/request";
-import UserContext from "./userProvider";
+import React, { useContext, useCallback } from "react";
 import {
   postRequest,
   getUserRequests,
-  getAllRequests,
+  getAllRequestsAdmin,
   setRequestStatus,
 } from "../api/api";
+import requestItem from "../models/request";
+import UserContext from "./userProvider";
 
 type requestContextObject = {
-  userRequests: requestItem[] | null;
-  openRequests: requestItem[] | null;
   addRequest: (item: requestItem) => void;
   updateRequest: (data: any) => void;
-  getOpenRequests: (type?: string | null) => void;
-  generalGetRequests: (data: any) => Promise<requestItem[] | undefined>;
+  getCurrentUserRequests: (
+    type?: string | null,
+  ) => Promise<requestItem[] | undefined>;
+  generalGetRequestsAdmin: (params?: any) => Promise<requestItem[] | undefined>;
 };
 
 const RequestContext = React.createContext<requestContextObject>({
-  userRequests: null,
-  openRequests: null,
   addRequest: (item: requestItem) => {},
   updateRequest: (data: any) => {},
-  getOpenRequests: (type?: string | null) => {},
-  generalGetRequests: async (data: any) => [],
+  getCurrentUserRequests: async (type?: string | null) => [],
+  generalGetRequestsAdmin: async (params?: any) => [],
 });
 
 export const RequestsProvider: React.FC<{ children: React.ReactNode }> = (
   props,
 ) => {
   const userCtx = useContext(UserContext);
-  const [userRequests, setUserRequests] = React.useState<requestItem[] | null>(
-    null,
-  );
-  const [openRequests, setOpenRequests] = React.useState<requestItem[] | null>(
-    null,
-  );
 
-  // maybe do make it generral with params like in the server and itll reurn arry of requestItems...
-  const getUserRequestsHandler = async () => {
-    let token = {
+  const getUserRequestsHandler = useCallback(async () => {
+    let headers = {
       headers: {
         Authorization: "Bearer " + userCtx.user?.auth,
       },
     };
     try {
-      const { data } = await getUserRequests(token);
-
-      if (data.length !== 0) {
-        let requestsList: requestItem[] = data.map((request: any) => {
-          return {
-            title: request.title,
-            type: request.type,
-            description: request.description,
-            status: request.status,
-            creatorName: request.creatore.userName,
-            createdAt: new Date(request.createdAt).toLocaleDateString(),
-            examinerName: request.examiner?.userName
-              ? request.examiner.userName
-              : null,
-            declineReason: request.declineReason ? request.declineReason : null,
-            id: request._id,
-          };
-        });
-        setUserRequests(requestsList);
-      }
-    } catch (error) {
-      console.error("Error fetching requests:", error);
-    }
-  };
-
-  const getOpenRequestsHandler = async (inputType?: string | null) => {
-    let token = {
-      headers: {
-        Authorization: "Bearer " + userCtx.user?.auth,
-      },
-      params: {
-        status: "בהמתנה",
-        type: inputType,
-      },
-    };
-    try {
-      const { data } = await getAllRequests(token);
-      let requestsList: requestItem[] | null = null;
-
+      const { data } = await getUserRequests(headers);
+      let requestsList: requestItem[] = [];
       if (data.length !== 0) {
         requestsList = data.map((request: any) => {
           return {
@@ -93,94 +47,81 @@ export const RequestsProvider: React.FC<{ children: React.ReactNode }> = (
             status: request.status,
             creatorName: request.creatore.userName,
             createdAt: new Date(request.createdAt).toLocaleDateString(),
-            id: request._id,
             examinerName: request.examiner?.userName
               ? request.examiner.userName
               : null,
             declineReason: request.declineReason ? request.declineReason : null,
+            id: request._id,
           };
         });
       }
-      setOpenRequests(requestsList);
+      return requestsList;
     } catch (error) {
       console.error("Error fetching requests:", error);
     }
-  };
+  }, [userCtx.user]);
 
-  useEffect(() => {
-    if (userCtx.user) {
-      getUserRequestsHandler();
-      if (userCtx.user?.role === "admin") {
-        getOpenRequestsHandler();
-      }
-    }
-  }, [userCtx.user?.auth]);
-
-  const addRequestHandler = async (item: requestItem) => {
-    console.log("in add request");
-    let token = {
+  const addRequestHandler = async (newItem: requestItem) => {
+    let headers = {
       headers: {
         Authorization: "Bearer " + userCtx.user?.auth,
       },
     };
-
     try {
-      const response = await postRequest(item, token);
-      console.log(response);
-      if (response.status === 201) {
-        getUserRequestsHandler();
-        if (userCtx.user?.role === "admin") {
-          getOpenRequestsHandler();
-        }
+      const response = await postRequest(newItem, headers);
+      if (response.status !== 201) {
+        throw new Error();
       }
+      alert("הבקשה נוצרה בהצלחה!")
     } catch (error) {
       console.error("Error posting request:", error);
     }
   };
 
-  const updateRequestStatusHandler = async (data: any) => {
-    let token = {
+  const updateRequestStatusHandler = async (updateRequestData: any) => {
+    // updateRequestData = {
+    //       requestId: props.request.id,
+    //       status: "סורבה",
+    //       declineReason: declinceRef.current?.value,
+    //     };
+
+    let headers = {
       headers: {
         Authorization: "Bearer " + userCtx.user?.auth,
       },
       params: {
-        requestId: data.requestId,
+        requestId: updateRequestData.requestId,
       },
     };
 
     try {
-      const response = await setRequestStatus(data, token);
-      if (response.status === 200) {
-        getUserRequestsHandler();
-        if (userCtx.user?.role === "admin") {
-          getOpenRequestsHandler();
-        }
+      const response = await setRequestStatus(updateRequestData, headers);
+      if (response.status !== 200) {
+        throw new Error();
       }
     } catch (error) {
       console.error("Error updating request:", error);
     }
   };
 
-  const getRequestsGeneralHandler = async (params: any) => {
-    let token = {
+  const getRequestsGeneralHandler = async (paramsInput?: any) => {
+    let headers = {
       headers: {
         Authorization: "Bearer " + userCtx.user?.auth,
       },
-      params: {
-        status: params.status,
-        type: params.inputType,
-        limit: params.limit,
-        skip: params.skip,
-        startSerchDate: params.startSerchDate,
-        endSerchDate: params.endSerchDate,
-      },
+      params: paramsInput ? paramsInput : undefined,
+      //possiable params: {
+      //   status: params.status,
+      //   type: params.inputType,
+      //   limit: params.limit,
+      //   skip: params.skip,
+      //   startSerchDate: params.startSerchDate,
+      //   endSerchDate: params.endSerchDate,
+      // },
     };
 
-    console.log(token);
-
     try {
-      const { data } = await getAllRequests(token);
-      console.log(data)
+      const { data } = await getAllRequestsAdmin(headers);
       let requestsList: requestItem[] = [];
 
       if (data.length !== 0) {
@@ -200,9 +141,6 @@ export const RequestsProvider: React.FC<{ children: React.ReactNode }> = (
           };
         });
       }
-      // else{
-      //   requestsList = []
-      // }
       return requestsList;
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -210,12 +148,10 @@ export const RequestsProvider: React.FC<{ children: React.ReactNode }> = (
   };
 
   const requestContext: requestContextObject = {
-    userRequests: userRequests,
-    openRequests: openRequests,
     addRequest: addRequestHandler,
     updateRequest: updateRequestStatusHandler,
-    getOpenRequests: getOpenRequestsHandler,
-    generalGetRequests: getRequestsGeneralHandler,
+    getCurrentUserRequests: getUserRequestsHandler,
+    generalGetRequestsAdmin: getRequestsGeneralHandler,
   };
 
   return (

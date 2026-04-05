@@ -1,18 +1,42 @@
 .request {
-    min-width: none;
-    max-width: 40%;
-    background-color: #90e0ef;
-    border-radius: 7px;
-    padding-right: 15px;
-    padding-bottom: 5px;
+  min-width: none;
+  max-width:40rem;
+  background-color: #defbff;
+  border-radius: 10px;
+  margin: 10px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+  font-size: larger;
 }
 
 .request h2 {
-    text-align: center;
-    color: rgb(50, 70, 227);
-    /* font-weight: bolder; */
+  text-align: center;
+  color: #03045e;
+}
+
+.request .refused {
+  font-weight: 600;
+  color: rgb(236, 69, 69);
+}
+
+.request .approved {
+  font-weight: 600;
+  color: green;
 }
 
 .request span {
-    color: #5a65ce;
+  color: #03045e;
+}
+
+
+.request input {
+  font: inherit;
+  width: 60%;
+  border-radius: 4px;
+  background-color: rgba(248, 247, 247, 0.445);
+  outline: none;
+  border: 0.2px solid rgba(43, 43, 43, 0.568);
+  padding: 0.15rem;
+  margin: 1rem;
+
 }
