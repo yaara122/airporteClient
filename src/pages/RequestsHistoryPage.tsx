@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useRef,
   useState,
-  useCallback,
 } from "react";
 import classes from "./pages.module.css";
 import requestItem from "../models/request";
@@ -29,65 +28,63 @@ const RequestsHistoryPage: React.FC<{}> = () => {
   const startDateRef = useRef<HTMLInputElement>(null);
   const endDateRef = useRef<HTMLInputElement>(null);
 
-  const fetchMoreRequests = 
-    async (fetchedAmountInput?: number) => {
-      let timesFetched;
-      if (fetchedAmountInput !== undefined) {
-        timesFetched = fetchedAmountInput;
-      } else {
-        timesFetched = fetcheAmount;
-      }
+  const fetchMoreRequests = async (fetchedAmountInput?: number) => {
+    let timesFetched;
+    if (fetchedAmountInput !== undefined) {
+      timesFetched = fetchedAmountInput;
+    } else {
+      timesFetched = fetcheAmount;
+    }
 
+    if (
+      startDateRef.current?.value &&
+      new Date(startDateRef.current?.value) > new Date()
+    ) {
+      setDateRangeError({
+        hasError: true,
+        errorText: "תאריך התחלתי לא יכול להיות גדול יותר מהתאריך של היום",
+      });
+      return;
+    }
+    if (startDateRef.current?.value && endDateRef.current?.value) {
       if (
-        startDateRef.current?.value &&
-        new Date(startDateRef.current?.value) > new Date()
+        new Date(endDateRef.current?.value) <
+        new Date(startDateRef.current?.value)
       ) {
         setDateRangeError({
           hasError: true,
-          errorText: "תאריך התחלתי לא יכול להיות גדול יותר מהתאריך של היום",
+          errorText: "תאריך התחלתי לא יכול להיות גדול יותר מהתאריך המקסימלי",
         });
         return;
       }
-      if (startDateRef.current?.value && endDateRef.current?.value) {
-        if (
-          new Date(endDateRef.current?.value) <
-          new Date(startDateRef.current?.value)
-        ) {
-          setDateRangeError({
-            hasError: true,
-            errorText: "תאריך התחלתי לא יכול להיות גדול יותר מהתאריך המקסימלי",
-          });
-          return;
-        }
-      }
-
-      let params = {
-        limit: AMOUNT_OF_REQUEST_PER_FETCH,
-        skip: timesFetched * AMOUNT_OF_REQUEST_PER_FETCH,
-        startSerchDate: startDateRef.current?.value,
-        endSerchDate: endDateRef.current?.value,
-      };
-
-      setDateRangeError({ hasError: false, errorText: "" });
-
-      let requestsList: requestItem[] | undefined =
-        await requestCtx.generalGetRequestsAdmin(params);
-      if (requestsList && requestsList.length > 0) {
-        if (fetchedAmountInput !== undefined) {
-          setRequestsHistory(requestsList);
-          setNoMoreRequests(false);
-        } else {
-          setRequestsHistory((prevHistory: requestItem[]) => {
-            return [...prevHistory, ...(requestsList ?? [])];
-          });
-        }
-        setFetchedAmount(timesFetched + 1);
-      } else {
-        setNoMoreRequests(true);
-      }
     }
-  ;
 
+    let params = {
+      limit: AMOUNT_OF_REQUEST_PER_FETCH,
+      skip: timesFetched * AMOUNT_OF_REQUEST_PER_FETCH,
+      startSerchDate: startDateRef.current?.value,
+      endSerchDate: endDateRef.current?.value,
+    };
+
+    setDateRangeError({ hasError: false, errorText: "" });
+
+    let requestsList: requestItem[] | undefined =
+      await requestCtx.generalGetRequestsAdmin(params);
+    if (requestsList && requestsList.length > 0) {
+      if (fetchedAmountInput !== undefined) {
+        setRequestsHistory(requestsList);
+        setNoMoreRequests(false);
+      } else {
+        setRequestsHistory((prevHistory: requestItem[]) => {
+          return [...prevHistory, ...(requestsList ?? [])];
+        });
+      }
+      setFetchedAmount(timesFetched + 1);
+    } else {
+      setNoMoreRequests(true);
+    }
+  };
+  
   useEffect(() => {
     setRequestsHistory([]);
     if (userCtx.user?.role === "admin") {
@@ -99,42 +96,38 @@ const RequestsHistoryPage: React.FC<{}> = () => {
     <Fragment>
       {requestsHistory && (
         <div className={classes.page}>
-         <div className={classes.data_container}>
-           <h1>היסטוריית בקשות</h1>
-          <div>
-            <label htmlFor="startDate">תאריך התחלת חיפוש </label>
-          <input
-            id="startDate"
-            type="date"
-            ref={startDateRef}
-            onChange={() => {
-              fetchMoreRequests(0);
-            }}
-          />
+          <div className={classes.data_container}>
+            <h1>היסטוריית בקשות</h1>
+            <div>
+              <label htmlFor="startDate">תאריך התחלת חיפוש </label>
+              <input
+                id="startDate"
+                type="date"
+                ref={startDateRef}
+                onChange={() => {
+                  fetchMoreRequests(0);
+                }}
+              />
+            </div>
+            <br />
+            <div>
+              <label htmlFor="endDate">תאריך מקסימלי לחיפוש </label>
+              <input
+                id="endDate"
+                type="date"
+                ref={endDateRef}
+                onChange={() => {
+                  fetchMoreRequests(0);
+                }}
+              />
+            </div>
+            <br />
+            {dateRangeError.hasError && <p>{dateRangeError.errorText}</p>}
           </div>
-          <br/>
-         <div>
-           <label htmlFor="endDate">תאריך מקסימלי לחיפוש  </label>
-          <input
-            id="endDate"
-            type="date"
-            ref={endDateRef}
-            onChange={() => {
-              fetchMoreRequests(0);
-            }}
-          />
-         
-         </div>
-          <br/>
-          {dateRangeError.hasError && <p>{dateRangeError.errorText}</p>}
-         </div>
-
-          
 
           <ul className={classes.container}>
             {requestsHistory.map((request) => (
               <Request request={request} />
-              // add key for each request
             ))}
           </ul>
           {noMoreRequests ? (

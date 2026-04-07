@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import { useNavigate } from "react-router-dom";
 import { userLogin } from "../api/api";
 import classes from "./forms.module.css";
 import user from "../models/user";
@@ -61,24 +61,21 @@ const LoginPage: React.FC<{}> = () => {
           newUser.role === undefined ||
           newUser.userName === undefined
         ) {
-          console.log("the response is not full");
-          throw new Error();
+          throw new Error("the response is not full");
         }
         userCtx.updateUserStatus(newUser);
         navigate("/createRequest");
       } catch (err) {
-        // const error = err as AxiosError<{
-        //   status: "error";
-        //   statusCode: number;
-        //   message: string;
-        // }>;
-        // console.log(error);
-        // if (error.response) {
-        //   console.error("API Error:", error.response.data.message);
-        // }
-        // //set error to error.response.data.message
-        // console.error(error);
-        alert("משהו השתבש")
+        const error = err as AxiosError<{ messagesArry: string[] }>;
+        if (error.response && error.response.data) {;
+          let errorString: string = "\n";
+          error.response.data.messagesArry.forEach((message) => {
+            errorString += `${message} \n\n`;
+          });
+          alert(errorString);
+        } else {
+          alert("משהו השתבש");
+        }
       }
     }
     if (formRef.current) {
@@ -92,11 +89,15 @@ const LoginPage: React.FC<{}> = () => {
         <h1>התחברות</h1>
         <label htmlFor="userName">אנא הכניסו שם משתמש</label>
         <input name="userName" type="text" ref={userNameInput}></input>
-        {!formValidation?.nameIsValid && <p  className={classes.input_error}>שם משתמש לא יכול להיות ריק</p>}
+        {!formValidation?.nameIsValid && (
+          <p className={classes.input_error}>שם משתמש לא יכול להיות ריק</p>
+        )}
         <label htmlFor="email">אנא הכניסו סיסמה</label>
-        <input name="email" type="text" ref={passwordInput}></input>
-        {!formValidation?.passwordIsValid && <p  className={classes.input_error}>סיסמה לא יכולה להיות ריקה</p>}
-        
+        <input name="email" type="password" ref={passwordInput}></input>
+        {!formValidation?.passwordIsValid && (
+          <p className={classes.input_error}>סיסמה לא יכולה להיות ריקה</p>
+        )}
+
         <Button type="submit">התחברות</Button>
       </form>
     </Card>

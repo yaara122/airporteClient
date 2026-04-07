@@ -40,7 +40,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = (
   }, []);
 
   const HandleOnLogOut = (userAuth?: string) => {
-    let config = {
+    try{let config = {
       headers: {
         Authorization: `Bearer ${userAuth ? userAuth : userState?.auth}`,
       },
@@ -56,7 +56,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = (
     if(timeoutId){
       clearTimeout(timeoutId)
     }
-    
+    }catch{
+      alert("משהו השתבש בתהליך ההתנתקות")
+    }
   };
 
   const HandleUserStausUpdate = (user: user) => {

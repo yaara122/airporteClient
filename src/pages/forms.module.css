@@ -18,16 +18,10 @@
 .form label {
   font-size: larger;
   font-weight: 600;
-  /* margin-bottom: 0px; */
-  /* margin-right: 35px; */
 }
 
 .form select {
-  /* padding: 50px;
-  margin-bottom: 1rem;
-  margin-top: -0.5rem; */
   margin-right: 2rem;
-  /* background-color: red; */
 }
 
 .form .type_explain_text {

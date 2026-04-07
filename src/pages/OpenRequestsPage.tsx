@@ -69,7 +69,6 @@ const OpenRequestsPage: React.FC<{}> = () => {
                 request={request}
                 resetOpenRequest={setOpenRequestsFunction}
               />
-              // add key for each request
             ))}
           </ul>
         </div>

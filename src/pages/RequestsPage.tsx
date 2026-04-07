@@ -23,7 +23,6 @@ const RequestsPage: React.FC<{}> = () => {
           <ul className={classes.container}>
             {requests.map((request) => (
               <Request request={request} />
-              // add key for each request
             ))}
           </ul>
         </div>

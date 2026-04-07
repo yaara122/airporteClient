@@ -19,9 +19,6 @@ const Header = () => {
       <div className={classes.header_top}>
         <div className={classes.logo}>
           <div className={classes.logo_text}>שדה תעופה </div>
-          {/* {userCtx.user && (
-            <i className={classes.logo_text}>welcome {userCtx.user.userName}</i>
-          )} */}
         </div>
         {!userCtx.isLogedIn &&
           (window.location.href.endsWith("signup") ? (

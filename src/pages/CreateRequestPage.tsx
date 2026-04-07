@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import pageClasses from "./pages.module.css";
 import classes from "./forms.module.css";
 import Card from "../components/UI/Card";
 import AddRequestForm from "../components/AddRequestForm";
@@ -31,9 +30,7 @@ const CreateRequestPage: React.FC<{}> = () => {
 
   return (
     <Card classNames={classes.form}>
-      {/* <div className={pageClasses.data_container}> */}
-      {/* <h2> בחרו את סוג הבקשה</h2> */}
-      <label htmlFor="select-request-type">בבקשה בחרו את סוג הבקשה - </label>
+      <label htmlFor="select-request-type"> בחרו את סוג הבקשה - </label>
       <select
         id="select-request-type"
         name="type"
