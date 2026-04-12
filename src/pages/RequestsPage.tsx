@@ -2,7 +2,7 @@ import React, { useContext, Fragment, useEffect, useState } from "react";
 import classes from"./pages.module.css"
 import RequestContext from "../store/RequestsProvider";
 import requestItem from "../models/request";
-import Request from "../components/Request";
+import Request from "../components/request"
 
 const RequestsPage: React.FC<{}> = () => {
   const [requests, setRequests] = useState<requestItem[]>();
@@ -17,7 +17,7 @@ const RequestsPage: React.FC<{}> = () => {
 
   return (
     <Fragment>
-      {requests && (
+      {requests && requests.length > 0  && (
         <div className={classes.page}>
           <h1>הבקשות שלי</h1>
           <ul className={classes.container}>
@@ -27,7 +27,7 @@ const RequestsPage: React.FC<{}> = () => {
           </ul>
         </div>
       )}
-      {!requests && <h1>הבקשות ריקות כרגע</h1>}
+      {(!requests || requests.length === 0 ) && <div className={classes.page}><h1>הבקשות ריקות כרגע</h1></div>}
     </Fragment>
   );
 };

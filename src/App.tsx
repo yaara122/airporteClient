@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { RequestsProvider } from "./store/RequestsProvider";
 import { UserProvider } from "./store/userProvider";
 import Header from "./components/UI/Header";
@@ -18,6 +18,7 @@ function App() {
         <Header />
         <RequestsProvider>
           <Routes>
+            <Route path="/" element={<Navigate to="/signup" replace />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/createRequest" element={<CreateRequestPage />} />

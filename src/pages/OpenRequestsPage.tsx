@@ -9,7 +9,7 @@ import classes from "./pages.module.css";
 import RequestContext from "../store/RequestsProvider";
 import requestItem from "../models/request";
 import UserContext from "../store/userProvider";
-import Request from "../components/Request";
+import Request from "../components/request";
 
 const OpenRequestsPage: React.FC<{}> = () => {
   const requestCtx = useContext(RequestContext);

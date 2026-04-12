@@ -9,7 +9,7 @@ import classes from "./pages.module.css";
 import requestItem from "../models/request";
 import UserContext from "../store/userProvider";
 import RequestContext from "../store/RequestsProvider";
-import Request from "../components/Request";
+import Request from "../components/request";
 import Button from "../components/UI/Button";
 
 const AMOUNT_OF_REQUEST_PER_FETCH = 3;
@@ -70,6 +70,7 @@ const RequestsHistoryPage: React.FC<{}> = () => {
 
     let requestsList: requestItem[] | undefined =
       await requestCtx.generalGetRequestsAdmin(params);
+
     if (requestsList && requestsList.length > 0) {
       if (fetchedAmountInput !== undefined) {
         setRequestsHistory(requestsList);
@@ -84,7 +85,7 @@ const RequestsHistoryPage: React.FC<{}> = () => {
       setNoMoreRequests(true);
     }
   };
-  
+
   useEffect(() => {
     setRequestsHistory([]);
     if (userCtx.user?.role === "admin") {
